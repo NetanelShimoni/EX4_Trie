@@ -84,14 +84,14 @@ void printR(node *root, char *str, int index)
     if (Stop(root) == FALSE)
     {
         str[index] = '\0';
-        printf("%s \t %ld\n", str, root->count);
+        printf("%s\t%ld\n", str, root->count);
         return;
     }
 
     if (root->count > 0 )
     {
         str[index] = '\0';
-        printf("%s \t %ld\n", str, root->count);
+        printf("%s\t%ld\n", str, root->count);
     }
 
     for (int i = NUM_LETTERS - 1; i >= 0; i--)
@@ -109,12 +109,12 @@ void print(node *root, char * str, int index) {
     if(Stop(root)==FALSE)
     {
         str[index]='\0';
-        printf("%s \t %ld\n",str,root->count);
+        printf("%s\t%ld\n",str,root->count);
         return;
     }
     if (root->count>0){
         str[index]='\0';
-        printf("%s \t %ld\n" , str,root->count);
+        printf("%s\t%ld\n" , str,root->count);
     }
     for (size_t i = 0; i <NUM_LETTERS; i++)
     {
