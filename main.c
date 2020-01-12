@@ -4,6 +4,9 @@
 #include <ctype.h>
 #define NUM_LETTERS ((int)26)
 #define END_CHAR 97
+#define line_size 1024
+#define word_size 256
+
 
 typedef enum {FALSE=0 ,TRUE=1} boolean;
 
@@ -12,133 +15,171 @@ typedef struct node{
     long unsigned int count;
     struct node* children [NUM_LETTERS];
 } node;
-void lowerstring(char str[]) {
-    for (int i = 0; i < strlen(str); i++) {
-        str[i]=tolower(str[i]);
+
+//char* check(char *key);
+
+
+void printR(node *root, char *str, int index);
+
+
+
+//init a new struct node
+node* getNode(void)
+{
+
+    node *root = NULL;
+
+    root = (node *)malloc(sizeof(node));
+
+    if (root)
+    {
+        int i;
+
+        root->count = 0;
+
+        for (i = 0; i < NUM_LETTERS; i++)
+            root->children[i] = NULL;
     }
 
+    return root;
 }
+//add a word to the trie
+void insert(node *root,  char* key)
+{
+    int level;
+    int length = strlen(key);
+    int index;
 
-node* newnode(char a){
-    node *p=NULL;
-    p=(node*)malloc(sizeof(node));
-    if(p==NULL){
-        printf("malloc is not working\n");
-    }else {
-        p->letter=a;
-        for (int i = 0; i < NUM_LETTERS; ++i) {
-            p->children[i]=(node*) malloc(sizeof(node));
-            if(p==NULL){
-                printf("malloc not sucssed to children\n");
-            }
-        }
-        p->count = 0;
-    }
-    return p;
-}
-void insert (node** root,char* a){
-    boolean inserted=FALSE;
-    printf("sddsd");
-    int j=0,i=0;
-    ///make lower char
-  //  lowerstring(a);
+   node *pCrawl = root;
 
-    int sizestring = strlen(a);
-    if(*root!=NULL){
-    for (; i < sizestring; i++) {
-        int value =a[i];
-    for ( ; j <NUM_LETTERS ; j++) {
-        if(a[i]==(*root)->children[j]->letter){
-            root=&((*root)->children[j]);
-            if ((*root)==NULL){
-                *root=newnode(a[i]);
-            }
-            inserted=TRUE;
-            ////break becuse we not need to chack all array and same place
-            break;
-        }}
-    ////not fount the letter and not inserted
-    if (!inserted){
-            //(*root)->children[value-END_CHAR]->letter=a[i];
-            *root=newnode(a[i]);
-            i++;
-           // root=&((*root)->children[value-END_CHAR]);
-            for (int k = i; k <sizestring; k++) {
-                if (k!=sizestring-1) {
-                    int value = a[k];
-                    int updatvalue = a[k + 1];
-                    *root = newnode(a[k]);
-                    (*root)->children[updatvalue - END_CHAR]->letter = a[k + 1];
-                    root = &((*root)->children[updatvalue - END_CHAR]);
-                }else{
-                    int value = a[k];
-                    *root = newnode(a[k]);
-                    (*root)->count++;
-                }
-            }
-//                *root=newnode(a[k]);
-//                value=a[k];
-//                (*root)->children[value-END_CHAR]->letter=a[k+1];
-//                root=&((*root)->children[value-END_CHAR]);
-//            }
-            return;
-        }
+    for (level = 0; level < length; level++)
+    {
+        index = key[level]-'a';
+        if (!pCrawl->children[index])
+            pCrawl->children[index] = getNode();
+        pCrawl = pCrawl->children[index];
+        pCrawl->letter=key[level];
 
     }
+
+    // mark last node as leaf
+    pCrawl->count++;
 }
-    for (int l = 0; l <sizestring; l++) {
-        if (l!=sizestring-1) {
-            int value = a[l];
-            int updatvalue = a[l + 1];
-            *root = newnode(a[l]);
-            (*root)->children[updatvalue - END_CHAR]->letter = a[l + 1];
-            root = &((*root)->children[updatvalue - END_CHAR]);
-        }else{
-            int value = a[l];
-            *root = newnode(a[l]);
-            (*root)->count++;
-        }
+
+//function that check if the node have at least one children
+int Stop(node *current){
+    boolean flag=FALSE;
+    for (size_t i = 0; i < NUM_LETTERS; i++)
+    {
+        if(current->children[i])
+            flag=TRUE;
     }
+    return flag;
 }
-void printTrie(node **root, char str[],int level){
-    if(*root==NULL){
+
+//print the words in trie sorted by a rising lexicographic order
+void printR(node *root, char *str, int index)
+{
+
+    if (Stop(root) == FALSE)
+    {
+        str[index] = '\0';
+        printf("%s \t %ld\n", str, root->count);
         return;
     }
-        for (int i = 0; i <NUM_LETTERS ; ++i) {
-            if((*root)->children[i]){
-                str[level]= i +'a';
-                printTrie((*root)->children[i],str,level+1);
-            }
+
+    if (root->count > 0 )
+    {
+        str[index] = '\0';
+        printf("%s \t %ld\n", str, root->count);
+    }
+
+    for (int i = NUM_LETTERS - 1; i >= 0; i--)
+    {
+        if (root->children[i])
+        {
+            str[index] = root->children[i]->letter;
+            printR(root->children[i], str, index + 1);
+        }
     }
 }
-void free_all(node** root)
+
+///print the words in trie sorted by a declining lexicographic order
+void print(node *root, char * str, int index) {
+    if(Stop(root)==FALSE)
+    {
+        str[index]='\0';
+        printf("%s \t %ld\n",str,root->count);
+        return;
+    }
+    if (root->count>0){
+        str[index]='\0';
+        printf("%s \t %ld\n" , str,root->count);
+    }
+    for (size_t i = 0; i <NUM_LETTERS; i++)
+    {
+        if(root->children[i]){
+            str[index]=root->children[i]->letter;
+            print(root->children[i],str,index+1);
+        }
+    }
+}
+
+//free the memory of all the nodes in the root
+void free_all(node* root)
 {
     int i;
-    if(!*root) return;   // safe guard including root node.
+    if(!root) return;   // safe guard including root node.
 
     // recursive case (go to end of trie)
     for (i = 0; i < NUM_LETTERS; i++)
-        free_all((*root)->children[i]);
+        free_all(root->children[i]);
 
 
     // base case
-    free(*root);
+    free(root);
 }
 
+int main(int argc , char* argv[]) {
+    node *root=getNode();
+    char word [word_size];
+    char line[line_size];
+    char c;
+    int len=0;
+    boolean flag = FALSE;
+    if(argc>=2 && strcmp(argv[1],"r")==0 ){
+        flag=TRUE;
+    }
+    while (fgets(line, sizeof(line),stdin)){
+        int counter=0;
+        len=strlen(line);
+        for (int i = 0; i <len ; i++) {
+            c=line[i];
+            if (c>='a' && c<='z' && c!= '\t' && c!=' ' && c!='\n' && c!='\0' ){
+                word[counter]=c;
+                counter++;
+            }
+            if(c>='A' && c<='Z' && c!= '\t' && c!=' ' && c!='\n' && c!='\0'){
+                char a= c+32;
+                c=a;
+                word[counter]=c;
+                counter++;
+            }
 
-
-
-int main() {
-    node** root =NULL;
-    insert(&root,"aba");
-    insert(&root,"mn");
-    insert(&root,"kfhf");
-    insert(&root,"duehfd");
-    insert(&root,"djfj");
-    int level =0;
-    char str[20];
-    printf("dfdf");
-    printTrie(root,str,level);
+            if (c== '\t' || c==' ' || c=='\n' || c=='\0'){
+                word[counter]='\0';
+                insert(root,word);
+                counter=0;
+            }
+        }
+    }
+    char str[word_size];
+    if (flag){
+        printR(root,str,0);
+    }else{
+        print(root,str,0);
+    }
     free_all(root);
+
     return 0;
 }
