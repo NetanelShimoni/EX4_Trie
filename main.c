@@ -8,7 +8,7 @@
 #define word_size 12
 #include "FuncTrie.h"
 
-
+// the main receiver from the comand line txt file and puts a words into the trie
 int main(int argc , char* argv[]) {
 
     node *root=getNode();
@@ -16,7 +16,7 @@ int main(int argc , char* argv[]) {
     char *word=NULL;
     word =(char*)malloc(1*sizeof(char));
     if (word==NULL){
-        printf("no allocet");
+        printf("not allocet");
         exit(1);
     }
     char c;

@@ -1,5 +1,5 @@
 typedef enum {FALSE=0 ,TRUE=1} boolean;
-
+//build a node
 typedef struct node{
     char letter;
     long unsigned int count;

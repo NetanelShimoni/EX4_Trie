@@ -10,7 +10,7 @@
 #include "FuncTrie.h"
 
 void printR(node *root, char *str, int index);
-
+/// new struct node
 node* getNode(void)
 {
     node *root = NULL;
@@ -30,22 +30,21 @@ node* getNode(void)
 //add a word to the trie
 void insert(node **root,  char* key)
 {
-    int level;
+    int i;
     int length = strlen(key);
     int index;
-    node *pCrawl = *root;
-    for (level = 0; level < length; level++)
+    node *runner = *root;
+    for (i = 0; i < length; i++)
     {
-        index = key[level]-'a';
-        if (!pCrawl->children[index])
-            pCrawl->children[index] = getNode();
-        pCrawl = pCrawl->children[index];
-        pCrawl->letter=key[level];
+        index = key[i]-'a';
+        if (!runner->children[index])
+            runner->children[index] = getNode();
+        runner = runner->children[index];
+        runner->letter=key[i];
 
     }
-
     // mark last node as leaf
-    pCrawl->count++;
+    runner->count++;
 }
 
 //function that check if the node have at least one children
